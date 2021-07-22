@@ -1,0 +1,67 @@
+----------------------------------------------------------------------------comandos para instalar mosquitto
+sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+sudo apt-get update
+sudo apt-get install mosquitto
+sudo apt-get install mosquitto-clients
+sudo apt install awscli
+------------------------------------------------------------------------------
+aws configure
+aws iot create-policy --policy-name bridgeMQTT --policy-document '{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Action": "iot:*","Resource": "*"}]}'
+cd /etc/mosquitto/certs/
+
+{
+    "certificateArn": "arn:aws:iot:us-east-1:557326660333:cert/6afb1ccb00bd77534495072a782f1d1f18fe2a959bd371ead162ff8287baf974",
+    "certificateId": "6afb1ccb00bd77534495072a782f1d1f18fe2a959bd371ead162ff8287baf974",
+    "certificatePem": "-----BEGIN CERTIFICATE-----\nMIIDWTCCAkGgAwIBAgIUTIhIDAz7lHv+ZJeWoT9oJgjndBYwDQYJKoZIhvcNAQEL\nBQAwTTFLMEkGA1UECwxCQW1hem9uIFdlYiBTZXJ2aWNlcyBPPUFtYXpvbi5jb20g\nSW5jLiBMPVNlYXR0bGUgU1Q9V2FzaGluZ3RvbiBDPVVTMB4XDTIxMDMyMjE4NTcy\nN1oXDTQ5MTIzMTIzNTk1OVowHjEcMBoGA1UEAwwTQVdTIElvVCBDZXJ0aWZpY2F0\nZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKF7+lEjndwuJpUtbnmX\nB3Oe70P1Q3ymXuTjaPppG5BWYLsoYH9r2Hx5TdaxPzRyNwpW9IplaIqMUYI8cn1h\n59uLLkhCtZROxDqkBtHzkutdUBR35e2Qzh0fSqFw7N2vgbdIQ8gakcWoDG4d7VgH\nEhKH7scrfsXtFcZojcdgocWiRj3yIEle+TeqpDGtYpA710IBfrspqs7g1RD+sOvJ\nGyBML6M0UMQH7ROnv9uKr4XElcJ8K2DJkWLFEv3B08fRYWuet75DhdlwXc+RJX00\nWSo+oyq1r4xOBCsKdyFfJdlLmc0dntQOXZXJ9oNsBqgnNC/e6IGfi9bCagTL/6Dc\nQmMCAwEAAaNgMF4wHwYDVR0jBBgwFoAUvtBcdeSOo0xsb1bP4cMVh6Y9qP8wHQYD\nVR0OBBYEFHrNT8APgV1j4u2MiAzXFJMRqczjMAwGA1UdEwEB/wQCMAAwDgYDVR0P\nAQH/BAQDAgeAMA0GCSqGSIb3DQEBCwUAA4IBAQBAFEySMfwKlWVkkeHAUTdmOjPU\nwHSkMBB151QcDHhjaw/Xz48ZRVtErgCJXD2CVSVh1eqWvQZI6ItqUGpZ1B3ogRsR\nyNBpI7AfwrjfKbP9789cvU94KFoERcgYK9/xd23ocCN7UiBj21X0Krp4TlGTdRKC\nwKwYDST4jJBbn+L4NkKA1xb1pbxmO5Ll9yF2cpnborRSFRxFVRrwsBRaReImHgYJ\nDizvzN6iDySr2ELU3rJ6npXjLhnAw02tHOkpdBnTBvvLuDHNGKr63SwxHO2VMLaS\nY9MtayGYx0VkPT4OEdJiTzu3XzYm6RBv/AR5YaPn814E+rei4ar4+wD66MG1\n-----END CERTIFICATE-----\n",
+    "keyPair": {
+        "PublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoXv6USOd3C4mlS1ueZcH\nc57vQ/VDfKZe5ONo+mkbkFZguyhgf2vYfHlN1rE/NHI3Clb0imVoioxRgjxyfWHn\n24suSEK1lE7EOqQG0fOS611QFHfl7ZDOHR9KoXDs3a+Bt0hDyBqRxagMbh3tWAcS\nEofuxyt+xe0VxmiNx2ChxaJGPfIgSV75N6qkMa1ikDvXQgF+uymqzuDVEP6w68kb\nIEwvozRQxAftE6e/24qvhcSVwnwrYMmRYsUS/cHTx9Fha563vkOF2XBdz5ElfTRZ\nKj6jKrWvjE4EKwp3IV8l2UuZzR2e1A5dlcn2g2wGqCc0L97ogZ+L1sJqBMv/oNxC\nYwIDAQAB\n-----END PUBLIC KEY-----\n",
+        "PrivateKey": "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAoXv6USOd3C4mlS1ueZcHc57vQ/VDfKZe5ONo+mkbkFZguyhg\nf2vYfHlN1rE/NHI3Clb0imVoioxRgjxyfWHn24suSEK1lE7EOqQG0fOS611QFHfl\n7ZDOHR9KoXDs3a+Bt0hDyBqRxagMbh3tWAcSEofuxyt+xe0VxmiNx2ChxaJGPfIg\nSV75N6qkMa1ikDvXQgF+uymqzuDVEP6w68kbIEwvozRQxAftE6e/24qvhcSVwnwr\nYMmRYsUS/cHTx9Fha563vkOF2XBdz5ElfTRZKj6jKrWvjE4EKwp3IV8l2UuZzR2e\n1A5dlcn2g2wGqCc0L97ogZ+L1sJqBMv/oNxCYwIDAQABAoIBAB4xrkZJoJSw1GoE\nSqnVgYEu8JIGZA4Ela26j8ByssK0Q/X6wMBSi/IKRHGmRqkpyfzW8XaHK5rsTblK\nUCX9jnrQdWDxiD4o1Cway2OqZYg4tGZ/XLCk6MUtOqkhEkkJLfn1OydJQIRyvZBB\nbEWPXOO2IwF+sn+TqwSkPA5RlS38s4RP0n/yCreHNxo7eah0PAxkEBedkTL+EaHk\nTaf5H2Ww6zTiPBsbpb3MJacA/LvOo+eOj1vZaqjxFwFHwVb90R3gefrdvcDuHj4K\ndwW7dyRDxfS7gLamo/TEx+m+nCnq0hD8IAagTDEyUnuvvUvcYOw2HlGLn0ejjRzA\n+u+i0kECgYEA1NS6rqa9jwoUEd7aRUoudzVdVY+0Uvej2vX7zmb6AidNIvhzSLOJ\n27K5AqP84kx+chF8M33eC0cifmwb/iB3dggdOkIZXlzeyUXbITO7RWJA7zR6MppH\niRVoxiu2zQ9xONM85hF/Vl51G7tuk5zh17Jq6xoyLaXy8RtgGrLSwPECgYEAwj0R\nB235Oi3hzutcFDVXcdXndkPIY6dJlQj2cXM+gJNgDJZq8HieeSK4mc2qDU0XhDRP\n1j49aA8bCi2lnNsjGVBWFNWK82lvYLl+wiQ8GUKlCU/99FBsyvwLowj96zlu1OJZ\ns7r9RkayVAh/ScWAV2wMxs01x7+FddBEP9XO+JMCgYAuPOEp3HPGRaxCjaXh89HQ\neDmEwymr9L0WbuZ72wdpvFwXwt5Y5xiGMHfdSP9Bstits3rGPQwmaxflW1thhHAv\npmejJoUYaRjFpXWL6w8+bbApx77ci4QLFimjFBAs0LQKYmoSma6Odwr+MWQ+kZDH\nKa3s0c4g+LKlCwuAAWWkIQKBgQCAPBa5A/bNXSs+E4533Pt9MQ4duwRaHkBq/z7M\niZwTALkhtlClr8xYBv8+s1P4chP7eRnYRMD/qTFd1+MFmnsipDIgkRaqOsqIXg58\nl7WBq8kPS9tKZ6pbnGkGWtJgcEtmioVULjg2JEhpSC7ZAmYH0VLiEOrXk+7FaBkW\n185LtwKBgQC5LLDUeIvYYN2tQ6E8vKlR3B7aqRHnRzHuDzjy1KG6D7xoyYDdpJjF\nPr7diA9lyFV4IbvSls3+o31+EscK2x+K1xumZV3sAmScLp56O8Ok6LyzUvAVFL7d\nSIu7iiVH1p2d/vT0PySRWO0HdTi97LjFhut1dJM0/knub/upJCQ7iQ==\n-----END RSA PRIVATE KEY-----\n"
+    }
+}
+
+aws iot attach-principal-policy --policy-name bridgeMQTT --principal arn:aws:iot:us-east-1:557326660333:cert/6afb1ccb00bd77534495072a782f1d1f18fe2a959bd371ead162ff8287baf974
+
+{
+    "endpointAddress": "a34fft2urvu4gr-ats.iot.us-east-1.amazonaws.com"
+}
+
+# ============================================================
+# Bridge to AWS IOT
+# ============================================================
+
+connection awsiot
+
+#<Paste your AWS IoT Core ATS endpoint retrieved from the AWS CLI in the form of xxxxxxxxxxxxxxx-ats.iot.<region>.amazonaws.com:8883
+
+address a34fft2urvu4gr-ats.iot.us-east-1.amazonaws.com:8883
+
+# Specifying which topics are bridged and in what fashion
+topic awsiot_to_localgateway in 1
+topic localgateway_to_awsiot out 1
+topic both_directions both 1
+
+# Setting protocol version explicitly
+bridge_protocol_version mqttv311
+bridge_insecure false
+
+# Bridge connection name and MQTT client Id, enabling the connection automatically when the broker starts.
+cleansession true
+clientid bridgeawsiot
+start_type automatic
+notifications false
+log_type all
+
+# ============================================================
+# Certificate based SSL/TLS support
+# ============================================================
+
+#Path to the rootCA
+bridge_cafile /etc/mosquitto/certs/rootCA.pem
+
+# Path to the PEM encoded client certificate
+bridge_certfile /etc/mosquitto/certs/cert.crt
+
+# Path to the PEM encoded client private key
+bridge_keyfile /etc/mosquitto/certs/private.key
+
+#END of bridge.conf

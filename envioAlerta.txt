@@ -1,0 +1,28 @@
+//comando Linux
+minicom -D /dev/ttyS0
+
+//estableciendo parametros GPRS
+
+AT+CGATT=1
+AT+SAPBR=3,1,"Contype","GPRS"
+AT+SAPBR=3,1,"APN","internet.itelcel.com"
+AT+SAPBR=3,1,"USER","webgprs"
+AT+SAPBR=3,1,"PWD","webgprs2002"
+
+//configurar HTTP
+
+AT+SAPBR=1,1
+AT+SAPBR=2,1
+AT+HTTPINIT
+AT+HTTPPARA="CID",1
+
+//enviar informacion
+
+AT+HTTPPARA="URL","http://backend-upiita.herokuapp.com/alerta/publicar-alternativo/?numero-serie=400&nombre-alerta=21/07/17/03:27:20&fecha-hora-inicio=2021-07-17T03:27:20&latitud=19.627038&longitud=-98.995743&fecha-hora=2021-07-17T03:27:20"
+AT+HTTPDATA=192,10000
+AT+HTTPACTION=1
+
+//finalizar conexion
+
+AT+HTTPTERM
+AT+SAPBR=0,1

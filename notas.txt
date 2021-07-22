@@ -1,0 +1,133 @@
+import serial 
+
+pin = 1111
+user= webgprs
+APN = 'internet.itelcel.com'
+pass = 'webgprs2002'
+
+
+PROCEDIMIENTO 
+verificar si el sim esta bloqueado
+comando AT+CPIN?
+
+verificar el estado de la red movil
+comando AT+CREG?
+
+iniciar la conexion a gprs 
+comando AT+CGATT=1
+
+definir el APN el password y el usuario
+comando AT+CSTT
+
+ACTIVAR EL PERFIL DE DATOS INALMABRICOS
+COMANDO AT+CIICR
+
+ACTIVAMOS EL PERFIL DE DATOS INALMABRICOS
+COMANDO AT+CIFSR
+
+INICIAR CONEXION TCP
+COMANDO AT+CIPSTART
+
+ENVIAR DATOS A TRAVES DE TCP
+COMANDO SEND  AT+CIPSEND
+
+#conexion simple o multiconexion con 0 o 1
+#AT+CPIN? #verificamos que el SIM no esta bloqueado
+#AT+CPIN= #introduccimos el PIN
+#AT+CREG? #checar si la SIM esta registrada 
+#AT+CGATT? #verifica si esta attached al GPRS
+#AT+CIPSHUT  #Cerrar la conexion PDP del GPRS
+#AT+CIPSTATUS #verifica el estado de la IP
+#AT+CIPMUX=0 #modo de una conexion
+#AT+CGDCONT=1,"IP","airtelgprs.com" #configuracion del PDP
+#AT+CSTT="airtelgprs.com"
+#AT+CIICR
+#AT+CIFSR
+#AT+CIPSTATUS
+#AT+CIPSTART= "TCP","flaskprint.herokuapp.com","80"
+#AT+CIPSEND 
+
+
+#imis/internet is the apn for idea connection
+connect "/usr/sbin/chat -v -f /etc/chatscripts/gprs -T internet.itelcel.com"
+ 
+# For Raspberry Pi3 use /dev/ttyS0 as the communication port:
+/dev/ttyS0
+ 
+# Baudrate
+115200
+ 
+# Assumes that your IP address is allocated dynamically by the ISP.
+noipdefault
+ 
+# Try to get the name server addresses from the ISP.
+usepeerdns
+ 
+# Use this connection as the default route to the internet.
+defaultroute
+ 
+# Makes PPPD "dial again" when the connection is lost.
+persist
+ 
+# Do not ask the remote to authenticate.
+noauth
+ 
+# No hardware flow control on the serial link with GSM Modem
+nocrtscts
+ 
+# No modem control lines with GSM Modem
+local
+
+
+
+
+
+
+
+-----------------------
+Acceder por medio de comandos http
+AT+CPIN? #verificar si el pin se encuentra bloqueado
+AT+CREG? #
+AT+CGATT?
+AT+CGATT=1
+AT+CSTT ="internet.itelcel.com"
+AT+CIICR
+AT+CIFSR
+-----------------------------------
+configuracion del gprs
+AT+SAPBR=3,1,"Contype","GPRS"
+AT+SAPBR=3,1,"APN","internet.itelcel.com"
+AT+SAPBR=3,1,"USER","webgprs"
+AT+SAPBR=3,1,"PWD","webgprs2002"
+-configuracion del http
+AT+SAPBR=1,1
+AT+SAPBR=2,1
+AT+HTTPINIT
+AT+HTTPPARA="CID",1
+AT+HTTPPARA="URL","http://demoserver-env.eba-3pe5jmgf.us-east-1.elasticbeanstalk.com/?nombre=carlos"
+AT+HTTPACTION=0
+AT+HTTPREAD
+AT+HTTPTERM
+AT+SAPBR=0,1
+
+
+AT+HTTPPARA="URL","http://sandro.awardspace.info/php/hola.php?Tu_nombre=Renzo"
+AT+HTTPPARA=CONTENT,application/x-www-form-urlencoded
+AT+HTTPDATA=192,5000
+AT+HTTPACTION=1
+AT+HTTPREAD
+AT+HTTPTERM
+AT+SAPBR=0,1
+
+
+
+AT+SAPBR=3,1,"APN","CMNET"
+AT+SAPBR=1,1
+AT+SAPBR=2,1
+AT+HTTPINIT
+AT+HTTPPARA="CID",1
+AT+HTTPPARA="URL","http://sandro.awardspace.info/php/hola.php?Tu_nombre=Renzo"
+AT+HTTPACTION=0
+AT+HTTPREAD
+AT+HTTPTERM
+AT+SAPBR=0,1
