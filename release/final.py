@@ -10,13 +10,35 @@ port = "/dev/ttyS0" #direccion del puerto serial
 numero_serie = 400 #numero de serie del dispositivo rastreador
 nombre_alerta = '' #nombre de la alerta
 fecha_hora_inicio = '' #fecha de inicio de la alerta
+push_button = 40
 
 
+def borrarInformacionAlerta(): #borrar la informacion de la alerta
+    global nombre_alerta
+    global fecha_hora_inicio
+    nombre_alerta = ''
+    fecha_hora_inicio = ''
+
+def alerta(channel):
+    
+    print('---Envio de la primera ubicacion---')
+    modulo.enviarInformacion() # enviar la primera ubicacion [~20 seg]
+
+    while True: 
+        time.sleep(240) #esperar 4 minutos para enviar la siguiente ubicacion
+        estado_alerta = modulo.alertaDesactivada() #verificar si la alerta fue desactivada [~20 seg]
+        print('*****Estado de la alerta: ' + str(estado_alerta) + ' *****')
+        if estado_alerta == False:
+            borrarInformacionAlerta() #borrar la informacion de la alerta
+            break #salir del bucle y de la funcion
+        else:
+            modulo.enviarInformacion() #enviar la siguiente ubicacion [~20 seg]
+
+    print('---Fin de la alerta---')
 
 class SIM808:
-    
-    """funcion para enviar comandos AT
-    def comando(self,comando,patron,tiempo):
+    """funcion para enviar comandos AT"""
+    def comando(self,comando,patron,limite):
         ejecucion = True
         while ejecucion == True:
             conteoRespuestas = 0
@@ -24,74 +46,61 @@ class SIM808:
             mensaje = bytes('{}\r'.format(comando),encoding='utf-8') #generar el comando
             print('Comando: {} ingresado'.format(mensaje))
             ser.write(mensaje)
-            while conteoRespuestas < tiempo:
+            while conteoRespuestas < limite:
                 try:
                     respuesta = ser.readline() #leer la respuesta
                     respuestasRecibidas += respuesta.decode('utf-8') #decodificar a utf-8
+                    print(f'^^^{respuestasRecibidas}')
                     conteoRespuestas += 1 #incrementar el contador
                 except:
-                    pass
+                    print('***No se leyo el buffer***')
 
             if re.search(patron,respuestasRecibidas):
+                print(f'+++Encontrado en el buffer: {respuestasRecibidas}')
                 ejecucion = False
-    """
-    """funcion para enviar comandos AT [prueba]"""
-    def comando(self,comando,patron,limite):
-        ejecucion = True
-        while ejecucion == True:
-            conteo_limite = 0
-            buffer = ''
-            mensaje = bytes('{}\r'.format(comando),encoding='utf-8')
-            ser.write(mensaje)
-            while conteo_limite < limite:
-                try:
-                    respuesta = ser.readline()
-                    buffer += respuesta.decode('utf-8')
-                    conteo_limite += 1
-                    if re.search(patron,buffer):
-                        ejecucion = False 
-                        conteo_limite = 1000
-                except:
-                    pass
-
-    """funcion para encender el modulo GPS""" #duracion [0.38 seg]
+            else:
+                print(f'+++No encontrado en el buffer: {respuestasRecibidas}')
+    
+    """funcion para encender el modulo GPS""" #[1.54 seg]
     def encenderGPS(self):
         print('---Encendiendo el modulo GPS---')
         start = time.time()
-        self.comando('AT+CGPSPWR=1',r'OK',2)
+        self.comando('AT+CGPSPWR=1',r'OK',5)
         
         print(f'---Modulo GPS encendido---{ time.time()-start }')
         time.sleep(1) #esperar 1 segundo
     
-    """Establecer los parametros para la comunicacion GPRS""" #duracion [0.38 seg]
+    """Establecer los parametros para la comunicacion GPRS""" #[2.86 seg]
     def parametrosGPRS(self):
         print('---Estableciendo parametros del GPRS---')
         start = time.time()
-        self.comando('AT+CGATT=1',r'OK',2) #attach or detach from GRPS
+        self.comando('AT+CGATT=1',r'OK',3) #attach or detach from GRPS
         
         #configurando el uso de GPRS y el envio de paquetes
-        self.comando('AT+SAPBR=3,1,\"Contype\",\"GPRS\"',r'OK',2)
+        self.comando('AT+SAPBR=3,1,\"Contype\",\"GPRS\"',r'OK',3)
         
         #configuracion del APN, user y password de la red
-        self.comando('AT+SAPBR=3,1,\"APN\",\"internet.itelcel.com\"',r'OK',2)
-        self.comando('AT+SAPBR=3,1,\"USER\",\"webgprs\"',r'OK',2)
-        self.comando('AT+SAPBR=3,1,\"PWD\",\"webgprs2002\"',r'OK',2)
+        self.comando('AT+SAPBR=3,1,\"APN\",\"internet.itelcel.com\"',r'OK',3)
+        self.comando('AT+SAPBR=3,1,\"USER\",\"webgprs\"',r'OK',3)
+        self.comando('AT+SAPBR=3,1,\"PWD\",\"webgprs2002\"',r'OK',3)
 
         print(f'---Parametros del GPRS establecidos---{time.time()-start}')
     
-    """funcion para conocer el status del modulo GPS""" #duracion [0.57 seg]  
+    """funcion para conocer el status del modulo GPS""" #[]  
     def statusGPS(self):
         print('---Verificando el estado del GPS---')
         start = time.time()
         self.comando('AT+CGPSSTATUS?',r'CGPSSTATUS: Location 3D Fix',5)
         print(f'---Estado del GPS correcto---{time.time()-start}')
     
-    """inicializar el sim808""" #duracion [0.76 seg]
+    """inicializar el sim808""" #[7.44 seg]
     def __init__(self):
         self.encenderGPS() #encender el modulo GPS
         self.parametrosGPRS() #establecer los parametros para GPRS
+        time.sleep(2.5)
+        self.configurarHTTP() #configurando el envio por HTTP
     
-    #funcion que devuleve la informacion necesaria para la alerta [0.71 seg]
+    #funcion que devuleve la informacion necesaria para la alerta [0.21 seg]
     def cordenadas(self):
         
         print('---Obteniendo las cordenadas---')
@@ -144,12 +153,12 @@ class SIM808:
         )
         return ano_r,mes_r,dia_r,horas_r,minutos_r,segundos_r,latitud,longitud
     
-    #funcion para configurar la comunicacion con HTTP [4.26 seg]
+    #funcion para configurar la comunicacion con HTTP []
     def configurarHTTP(self):
         print('---Configurando comunicacion HTTP---')
         start = time.time()
-        self.comando('AT+SAPBR=1,1',r'OK',8) #open the carrier 
-        #self.comando('AT+SAPBR=2,1',r'SAPBR: 1,1',10) #status del carrier
+        self.comando('AT+SAPBR=1,1',r'OK',10) #open the carrier 
+        self.comando('AT+SAPBR=2,1',r'SAPBR: 1,1',3) #status del carrier
 
         self.comando('AT+HTTPINIT',r'OK',3) #iniciar el servicio HTTP
 
@@ -160,6 +169,7 @@ class SIM808:
 
     #funcion para enviar la informacion al servidor []
     def enviarInformacion(self):
+        start = time.time()
         #obtener las cordenadas
         ano,mes,dia,horas,minutos,segundos,latitud,longitud = self.cordenadas()
 
@@ -178,15 +188,15 @@ class SIM808:
             + 'fecha-hora=' + fecha_hora
 
         print('---Enviando informacion---')
-        self.comando('AT+HTTPPARA="URL","{}"'.format(enlace),r'OK',10) #configurando la url
+        self.comando('AT+HTTPPARA="URL","{}"'.format(enlace),r'OK',3) #configurando la url
         #tamaño del paquete a enviar 192 bytes
         #tiempo de espera antes de abortar el envio 10 segundos
-        self.comando('AT+HTTPDATA=192,10000',r'OK',50)
+        self.comando('AT+HTTPDATA=192,10000',r'OK',25)
         #envio de contenido
         # POST=1 / GET=0
         # status code 200
-        self.comando('AT+HTTPACTION=1',r'HTTPACTION: (.*?),200,',50)
-        print('---Envio de informacion finalizado---')
+        self.comando('AT+HTTPACTION=1',r'HTTPACTION: (.*?),200,',18)
+        print(f'---Envio de informacion finalizado---{time.time()-start}')
 
     #funcion para generar u obtener el nombre_alerta
     def generarNombreAlerta(self,ano,mes,dia,horas,minutos,segundos):
@@ -210,7 +220,7 @@ class SIM808:
         fecha_hora = ano+'-'+mes+'-'+dia+'T'+horas+':'+minutos+':'+segundos
         return fecha_hora 
 
-    #funcion para cerrar la conexion [3.5 seg]
+    #funcion para cerrar la conexion [3.29 seg]
     def finalizarConexionHTTP(self):
         print('---Finalizando conexion HTTP---')
         start = time.time()
@@ -229,8 +239,8 @@ class SIM808:
         ejecutar = True
         while ejecutar == True:
             self.comando('AT+HTTPPARA="URL","{}"'.format(enlace),r'OK',3) 
-            self.comando('AT+HTTPDATA=192,10000',r'OK',25)
-            self.comando('AT+HTTPACTION=0',r'HTTPACTION: (.*?),200,',15) #status code 200
+            self.comando('AT+HTTPDATA=100,10000',r'OK',25)
+            self.comando('AT+HTTPACTION=0',r'HTTPACTION: (.*?),200,',18) #status code 200
             response = self.readResponseHTTP('AT+HTTPREAD',6) #guardar la respuesta del servidor
             if re.search(r'false',response): #leer la respuesta del servidor
                 estado_alerta = False #la alerta fue desactivada
@@ -243,7 +253,7 @@ class SIM808:
         return estado_alerta #devolver el estado de la alerta
 
     #funcion para leer la respuesta que envia el servidor [1.07 seg]
-    def readResponseHTTP(self,comando,tiempo):
+    def readResponseHTTP(self,comando,limite):
         
         ejecucion = True
         start = time.time()
@@ -254,7 +264,7 @@ class SIM808:
             print('Comando: {} ingresado'.format(mensaje))
             ser.write(mensaje) #enviar comando
             
-            while conteoRespuestas < tiempo:
+            while conteoRespuestas < limite:
                 try:
                     respuesta = ser.readline()
                     respuestasRecibidas += respuesta.decode('utf-8')
@@ -286,37 +296,53 @@ class SIM808:
 
         return ano_r,mes_r,dia_r,horas_r,minutos_r,segundos_r
 
-
-
-#funcion para borrar la informacion de la alerta
-def borrarInformacionAlerta():
-    global nombre_alerta
-    global fecha_hora_inicio
-    nombre_alerta = ''
-    fecha_hora_inicio = ''
-
+    """funcion para enviar comandos AT [prueba]
+    def comando(self,comando,patron,limite):
+        ejecucion = True
+        while ejecucion == True:
+            time.sleep(0.2)
+            buffer = ''
+            conteo_limite = 0
+            mensaje = bytes('{}\r'.format(comando),encoding='utf-8')
+            print(f'Comando ingresado: {str(mensaje)}')
+            ser.write(mensaje)
+            while conteo_limite < limite:
+                try:
+                    respuesta = ser.readline()
+                    buffer += respuesta.decode('utf-8')
+                    conteo_limite += 1
+                    print(f'conteo: {conteo_limite} -- {buffer}')
+                    if re.search(patron,buffer):
+                        print(f'Buffer: {buffer}')
+                        ejecucion = False 
+                        conteo_limite = 1000
+                except:
+                    print('No se leyo el buffer')
+    """
 
 
 """Configuracion del modulo SIM808"""
 ser = serial.Serial(port,baudrate=9600,timeout=0.5) #configuracion del puerto serial
 modulo = SIM808() #inicializar el SIM808
 
-modulo.configurarHTTP()
-modulo.alertaDesactivada()
-modulo.finalizarConexionHTTP()
+"""Configuracion de la interrupcion"""
+GPIO.setwarnings(False) #apagar los warnings
+GPIO.setmode(GPIO.BOARD) #numeracion de la placa
+GPIO.setup( # entrada con resistencia pull-down
+    push_button, 
+    GPIO.IN, 
+    pull_up_down=GPIO.PUD_DOWN
+)
+GPIO.add_event_detect( #configuracion de la interrupcion
+    push_button,
+    GPIO.RISING,
+    callback=alerta, 
+    bouncetime= 3000 # [3 seg]
+)
 
-"""Enviar la alerta
-modulo.configurarHTTP()
-modulo.enviarInformacion() # enviar la primera ubicacion
-while True: 
-    time.sleep(240) #esperar 4 minutos para enviar la siguiente ubicacion
-    estado_alerta = modulo.alertaDesactivada() #verificar si la alerta fue desactivada
-    print('*****Estado de la alerta: ' + str(estado_alerta) + ' *****')
-    if estado_alerta == False:
-        borrarInformacionAlerta() #borrar la informacion de la alerta
-        break #salir del bucle y finalizar la conexion
-    else:
-        modulo.enviarInformacion() #enviar la siguiente ubicacion
+while True: #loop
+    pass
 
-modulo.finalizarConexionHTTP()
-"""
+#modulo.alertaDesactivada()
+#modulo.enviarInformacion() #enviar una alerta
+#modulo.finalizarConexionHTTP() #finalizar la conexion

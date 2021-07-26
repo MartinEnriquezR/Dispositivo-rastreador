@@ -1,25 +1,27 @@
-import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
+import RPi.GPIO as GPIO
 import time
 
 
-def button_callback(channel):
-    #configurar el GPS
-    #establecer la conexion AWS IoT
-    #leer si existe un mensaje de salir de enviar la info 
-    #crear el mensaje PAYLOAD 
-    bucle = True
-    while bucle == True:
-        print('dentro de la interrupcion')
-        bucle = False
-        print('saliendo de la interrupcion' + str(bucle))
+def alerta(channel):
+    print('dentro de la interrupcion')
+    print('saliendo de la interrupcion')
 
 
-pin = 40
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #resistencia de pull down
-GPIO.add_event_detect(pin,GPIO.RISING,callback=button_callback, bouncetime= 5000) # Setup event on pin 40 rising edge
+push_button = 40 # pin del boton
+GPIO.setwarnings(False) #apagar los warnings
+GPIO.setmode(GPIO.BOARD) #numeracion de la placa
+GPIO.setup( # entrada con resistencia pull-down
+    push_button, 
+    GPIO.IN, 
+    pull_up_down=GPIO.PUD_DOWN
+)
+GPIO.add_event_detect( #configuracion de la interrupcion
+    push_button,
+    GPIO.RISING,
+    callback=alerta, 
+    bouncetime= 3000
+)
 
-while True:
+while True: #bucle infinito
     print('mensaje de prueba')
-    time.sleep(4)
+    time.sleep(1)

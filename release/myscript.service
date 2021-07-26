@@ -1,0 +1,13 @@
+[Unit]
+Description=Servicio para el Dispositivo Rastreador
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 -u tiempo.py
+WorkingDirectory=/home/pi/release
+Restart=always
+RestartSec=5s
+User=pi
+
+[Install]
+WantedBy=multi-user.target
