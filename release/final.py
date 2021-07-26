@@ -18,8 +18,8 @@ def borrarInformacionAlerta(): #borrar la informacion de la alerta
     global fecha_hora_inicio
     nombre_alerta = ''
     fecha_hora_inicio = ''
-
-def alerta(channel):
+#channel
+def alerta():
     
     print('---Envio de la primera ubicacion---')
     modulo.enviarInformacion() # enviar la primera ubicacion [~20 seg]
@@ -333,15 +333,18 @@ GPIO.setup( # entrada con resistencia pull-down
     GPIO.IN, 
     pull_up_down=GPIO.PUD_DOWN
 )
+"""
 GPIO.add_event_detect( #configuracion de la interrupcion
     push_button,
     GPIO.RISING,
     callback=alerta, 
     bouncetime= 3000 # [3 seg]
 )
+"""
 
 while True: #loop
-    pass
+    if GPIO.input(40) == GPIO.HIGH:
+        alerta()
 
 #modulo.alertaDesactivada()
 #modulo.enviarInformacion() #enviar una alerta
